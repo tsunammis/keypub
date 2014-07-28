@@ -27,7 +27,8 @@
     "command-asker": "~0.2.0",
     "moment": "^2.6.0",
     "ejs": "^1.0.0",
-    "randomstring": "^1.0.3"
+    "randomstring": "^1.0.3",
+    "nodemailer": "^1.0.4"
   },
   "devDependencies": {
     "mocha": "^1.18.2",
@@ -38,6 +39,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "jshint-stylish": "^0.2.0",
     "matchdep": "^0.3.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "^0.6.1",
+    "nodemon": "^1.2.1"
   }
 }

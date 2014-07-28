@@ -8,6 +8,7 @@ function Configuration() {
     this.port       = process.env.PORT || 5000;
     this.host       = process.env.KEYPUB_HOST || "localhost";
     this.mongodb    = process.env.KEYPUB_MONGODB_PATH || 'mongodb://localhost/keypub';
+    this.encoding   = process.env.KEYPUB_ENCODING || 'utf8';
 }
 
 /**

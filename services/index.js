@@ -1,5 +1,7 @@
-var keyService     = require('./key');
+var keyService     = require('./key'),
+    mailService    = require('./mail');
 
 module.exports = {
-    Key:  keyService
+    Key:  keyService,
+    Mail: mailService
 };

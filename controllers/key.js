@@ -8,6 +8,7 @@ var Key                 = require('../models').Key,
     errors              = require('../validator').Errors,
     _                   = require('lodash'),
     Configuration       = require('../config/configuration'),
+    mailService         = require('../services/mail'),
     when                = require('when');
 
 /**
@@ -111,6 +112,7 @@ var key = function(req, res, next) {
         })
         .then(function(key) {
             key = key.toObject();
+            mailService.sendConfirmation(key.email, key.token);
             console.log(JSON.stringify(key));
         })
         .then(null, function(err) {
