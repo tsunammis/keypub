@@ -32,12 +32,12 @@ module.exports = function(grunt) {
             },
             all: [
                 'app.js', 
-                '{adapter,cli,config,controllers,helpers,models,services,test,validator}/**/*.js'
+                '{cli,config,controllers,helpers,models,services,test,validator}/**/*.js'
             ]
         },
         watch: {
             default: {
-                files: ['**/*.js'],
+                files: ['**/*.js', '!**/node_modules/**'],
                 tasks: ['jshint']
             }
         }
