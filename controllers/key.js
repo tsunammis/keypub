@@ -1,8 +1,9 @@
 var Key                 = require('../models').Key,
     keyService          = require('../services').Key,
+    keyConst            = require('../const').Key,
     httpErrors          = require('../helpers/http.errors'),
     objectHelper        = require('../helpers/object'),
-    randomstring        = require('randomstring');
+    randomstring        = require('randomstring'),
     keyValidator        = require('../validator').Key,
     stringValidator     = require('../validator').String,
     errors              = require('../validator').Errors,
@@ -67,8 +68,57 @@ var fingerprint = function(req, res, next) {
  */
 var confirmToken = function(req, res, next) {
 
-    console.log('/:email/confirm/:token');
-    return next();
+    var data = req.params,
+        key = null;
+
+    stringValidator.isEmail(data.email)
+        .then(function() {
+            return stringValidator.isLength(
+                data.token,
+                Configuration.tokenLength,
+                Configuration.tokenLength
+            );
+        })
+        .then(function() {
+            return keyService.findOneToConfirm(
+                data.email,
+                data.token
+            );
+        })
+        .then(function(k) {
+            if (!k) {
+                return when.reject(new httpErrors.NotFound(errors.key.not_found));
+            }
+
+            key = k;
+
+            if (keyConst.status.EXPIRED == key.status) {
+                return when.resolve('Your key has expired.');
+            }
+
+            if (keyConst.status.CONFIRMED == key.status) {
+                return when.resolve('Your key has already confirmed');
+            }
+
+            // TODO Add promise with key.save()
+            key.status = keyConst.status.CONFIRMED;
+            key.save();
+            return when.resolve('your key has been confirmed');
+        })
+        .then(function(message) {
+            res
+                .render('html/confirm.ejs', {
+                    message: message
+                });
+        })
+        .then(null, function(err) {
+            if (_.has(err, 'code')) {
+                return next(new httpErrors.BadRequest(err.message, err.code));
+            } else if (_.has(err, 'name') && err.name === 'CastError') {
+                return next(new httpErrors.BadRequest(errors.string.documentid_bad_format));
+            }
+            return next(err);
+        });
 };
 
 /**
@@ -107,7 +157,7 @@ var key = function(req, res, next) {
                 data: data,
                 email: email,
                 status: 'pending',
-                token: randomstring.generate(24)
+                token: randomstring.generate(Configuration.tokenLength)
             });
         })
         .then(function(key) {

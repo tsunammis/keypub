@@ -52,5 +52,17 @@ module.exports = {
             this.message = msg || 'Not found';
         }
         this.status = 404;
+    },
+    InternalServer: function(msg, code) {
+        if (isErrorObject(msg)) {
+            this.code = msg.code;
+            this.message = msg.message;
+        } else {
+            if (code !== undefined && code !== null) {
+                this.code = code;
+            }
+            this.message = msg || 'Internal Server';
+        }
+        this.status = 500;
     }
 };

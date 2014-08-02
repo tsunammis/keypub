@@ -1,5 +1,6 @@
 var Key         = require('../models').Key,
-    ObjectId    = require('mongoose').Types.ObjectId;
+    ObjectId    = require('mongoose').Types.ObjectId,
+    keyConst    = require('../const').Key;
 
 /**
  * Remove key by ID.
@@ -43,6 +44,25 @@ var findOneReadOnlyById = function(id, select) {
             _id: new ObjectId(id)
         })
         .lean(true);
+
+    if (select) {
+        query.select(select);
+    }
+
+    return query.exec();
+};
+
+/**
+ * Find key by token.
+ *
+ * @param {string} email
+ * @param {string} token
+ */
+var findOneToConfirm = function(email, token, select) {
+    var query = Key
+        .findOne()
+        .where('email').equals(email)
+        .where('token').equals(token);
 
     if (select) {
         query.select(select);
@@ -96,6 +116,7 @@ module.exports = {
     removeById            : removeById,
     findOneById           : findOneById,
     findOneReadOnlyById   : findOneReadOnlyById,
+    findOneToConfirm      : findOneToConfirm,
     findReadOnlyByEmail   : findReadOnlyByEmail,
     findReadOnlyByName    : findReadOnlyByName
 };

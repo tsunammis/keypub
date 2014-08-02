@@ -2,6 +2,7 @@ module.exports = {
     'unknow':                           { 'code': '0',     'message': "Unknow error" },
     'key': {
         'data_length':                  { 'code': 'K-1',   'message': "key.data must be not null" },
+        'not_found':                    { 'code': 'K-2',   'message': "key not found" }
     },
     'user': {
         'password_confirmation_fail':   { 'code': 'U-1',    'message': "Both password are not the same" },
@@ -15,9 +16,11 @@ module.exports = {
         'not_null':                     { 'code': 'str-1',  'message': "the string must be not null" },
         'email_bad_format':             { 'code': 'str-2',  'message': "the email's format is not valid" },
         'slug_bad_format':              { 'code': 'str-3',  'message': "the slug's format is not valid" },
-        'documentid_bad_format':        { 'code': 'str-4',  'message': "the id's format is not valid" }
+        'documentid_bad_format':        { 'code': 'str-4',  'message': "the id's format is not valid" },
+        'bad_length':                   { 'code': 'str-5',  'message': "the length is bad" }
     },
     'storage': {
-        'connection_error':             { 'code': 'store-1','message': "Error durring connection with mongo" }
+        'connection_error':             { 'code': 'store-1','message': "Error durring connection with mongo" },
+        'unknow':                       { 'code': 'store-2','message': "Error durring saving" }
     }
 };

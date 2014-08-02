@@ -30,9 +30,17 @@ var isDocumentId = function(str) {
     return when.resolve(str);
 };
 
+var isLength = function(str, min, max) {
+    if (!validator.isLength(str, min, max)) {
+        return when.reject(errors.string.bad_length);
+    }
+    return when.resolve(str);
+};
+
 module.exports = {
     isNotNull: isNotNull,
     isEmail: isEmail,
     isSlug: isSlug,
-    isDocumentId: isDocumentId
+    isDocumentId: isDocumentId,
+    isLength: isLength
 };
