@@ -3,7 +3,7 @@ var Mailer          = require('../config/mailer'),
     Configuration   = require('../config/configuration'),
     when            = require('when'),
     keyService      = require('./key'),
-    errors          = require('../validator/errors'),
+    errors          = require('../validator').Errors,
     nodefn          = require('when/node');
 
 /**

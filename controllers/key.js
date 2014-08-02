@@ -3,6 +3,7 @@ var Key                 = require('../models').Key,
     keyConst            = require('../const').Key,
     httpErrors          = require('../helpers/http.errors'),
     objectHelper        = require('../helpers/object'),
+    hashHelper          = require('../helpers/hash'),
     randomstring        = require('randomstring'),
     keyValidator        = require('../validator').Key,
     stringValidator     = require('../validator').String,
@@ -84,8 +85,17 @@ var install = function(req, res, next) {
  */
 var fingerprint = function(req, res, next) {
 
-    console.log('/:email/fingerprint');
-    return next();
+    var email = req.params.email;
+    var name = req.params.key === undefined ? 'default' : req.params.key;
+
+    keyService.findOneReadOnlyActiveByEmailAndName(email, name)
+        .then(function(key) {
+            if (!key) {
+                return when.reject(errors.key.not_found);
+            }
+            keySplited = key.content.split(" ");
+            res.send(hashHelper.hashMD5HexDigest(keySplited[1]));
+        });
 };
 
 /**
@@ -152,8 +162,6 @@ var confirmToken = function(req, res, next) {
  * Add new key with email and key name as parameters
  *
  * POST  /:email/:keyName
- *
- * TODO Check if key's name is not already taken
  */
 var key = function(req, res, next) {
 
