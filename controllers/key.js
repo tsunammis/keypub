@@ -13,6 +13,8 @@ var Key                 = require('../models').Key,
     when                = require('when');
 
 /**
+ * Show the list of key(s) and their status
+ *
  * GET  /:email
  */
 var email = function(req, res, next) {
@@ -22,10 +24,25 @@ var email = function(req, res, next) {
 };
 
 /**
+ * Generate bash script to upload key.
+ * If the 'key' parameter is specified,
+ * then the key will be saved with this name.
+ *
+ * Example (inside your terminal):
+ *
+ * this link will upload the key with name "default"
+ * curl -s http://localhost:5000/stanislas.chollet@gmail.com/upload | bash
+ *
+ * this link will upload the key with "ovh"
+ * curl -s http://localhost:5000/stanislas.chollet@gmail.com/ovh/upload | bash
+ *
+ * Also, if parameter 'keypath' is specified, the script will contain
+ * the absolute path to the key to install.
+ *
  * GET  /:email/upload
  * GET  /:email/:key/upload
  */
-var upload = function(req, res, next) {
+var upload = function(req, res) {
 
     console.log('/:email/upload or /:email/:key/upload');
     
@@ -44,7 +61,12 @@ var upload = function(req, res, next) {
 };
 
 /**
- * GET  /:email/install
+ * Install key(s) from users inside
+ * the $HOME/.ssh/authorized_keys file
+ *
+ * GET  /:email/install         -> Install just the 'default' key
+ * GET  /:email/:key/install    -> Install just the key with name :key
+ * GET  /:email/all/install     -> Install all keys
  */
 var install = function(req, res, next) {
 
@@ -55,7 +77,10 @@ var install = function(req, res, next) {
 };
 
 /**
- * GET  /:email/fingerprint
+ * Show the fingerprint of key
+ *
+ * GET  /:email/fingerprint         -> Show the fingerprint of 'default' key
+ * GET  /:email/:key/fingerprint    -> Show the fingerprint of the key with name :key
  */
 var fingerprint = function(req, res, next) {
 
@@ -64,6 +89,8 @@ var fingerprint = function(req, res, next) {
 };
 
 /**
+ * Token's confirmation (Link sent inside confirmation's mail)
+ *
  * GET  /:email/confirm/:token
  */
 var confirmToken = function(req, res, next) {
@@ -122,25 +149,11 @@ var confirmToken = function(req, res, next) {
 };
 
 /**
- * GET  /:email/all
- */
-var all = function(req, res, next) {
-
-    console.log('/:email/all');
-    return next();
-};
-
-/**
- * GET  /:email/all/install
- */
-var allInstall = function(req, res, next) {
-
-    console.log('/:email/all/install');
-    return next();
-};
-
-/**
+ * Add new key with email and key name as parameters
+ *
  * POST  /:email/:keyName
+ *
+ * TODO Check if key's name is not already taken
  */
 var key = function(req, res, next) {
 
@@ -179,23 +192,6 @@ var key = function(req, res, next) {
     return next();
 };
 
-/**
- * GET  /:email/:key/fingerprint
- */
-var keyFingerprint = function(req, res, next) {
-
-    console.log('/:email/:key/fingerprint');
-    return next();
-};
-
-/**
- * GET  /:email/:key/install
- */
-var keyInstall = function(req, res, next) {
-
-    console.log('/:email/:key/install');
-    return next();
-};
 
 module.exports = {
     email: email,
@@ -203,9 +199,5 @@ module.exports = {
     install: install,
     fingerprint: fingerprint,
     confirmToken: confirmToken,
-    all: all,
-    allInstall: allInstall,
-    key: key,
-    keyFingerprint: keyFingerprint,
-    keyInstall: keyInstall
+    key: key
 };

@@ -20,11 +20,10 @@ app.route('/:email/upload').get(controllers.Key.upload);
 app.route('/:email/install').get(controllers.Key.install);
 app.route('/:email/fingerprint').get(controllers.Key.fingerprint);
 app.route('/:email/confirm/:token').get(controllers.Key.confirmToken);
-app.route('/:email/all').get(controllers.Key.all);
-app.route('/:email/all/install').get(controllers.Key.allInstall);
+app.route('/:email/all/install').get(controllers.Key.install);
 app.route('/:email/:keyName').post(controllers.Key.key);
-app.route('/:email/:key/fingerprint').get(controllers.Key.keyFingerprint);
-app.route('/:email/:key/install').get(controllers.Key.keyInstall);
+app.route('/:email/:key/fingerprint').get(controllers.Key.fingerprint);
+app.route('/:email/:key/install').get(controllers.Key.install);
 app.route('/:email/:key/upload').get(controllers.Key.upload);
 app.route('/:email').get(controllers.Key.email);
 
