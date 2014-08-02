@@ -1,8 +1,16 @@
 <i>Hello,</i><br />
 <br />
-To activate your keyn, click on this link below.<br />
+<%= newKey.content %><br />
+<br />
+To activate your key above, you have to click on the link.<br />
 <br />
 <a href="<%= link %>"><%= link %></a><br />
+<br />
+<% if (oldKey) { %>
+Warning: You have already a key with this "<%= newKey.name %>", so, if you confirm your new key, the former key (below) will be deleted.<br />
+<br />
+<%= oldKey.content %><br />
+<% } %>
 <br />
 Thank you,<br />
 <br />

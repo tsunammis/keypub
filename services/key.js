@@ -6,6 +6,7 @@ var Key         = require('../models').Key,
  * Remove key by ID.
  *
  * @param {string} id
+ * @return {promise}
  */
 var removeById = function(id) {
     return Key
@@ -18,6 +19,8 @@ var removeById = function(id) {
  * Find key by ID.
  *
  * @param {string} id
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
  */
 var findOneById = function(id, select) {
     var query = Key
@@ -37,6 +40,8 @@ var findOneById = function(id, select) {
  * The data return are Read Only (Plain Objet) instead of MongooseDocument
  *
  * @param {string} id
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
  */
 var findOneReadOnlyById = function(id, select) {
     var query = Key
@@ -57,6 +62,8 @@ var findOneReadOnlyById = function(id, select) {
  *
  * @param {string} email
  * @param {string} token
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
  */
 var findOneToConfirm = function(email, token, select) {
     var query = Key
@@ -75,7 +82,9 @@ var findOneToConfirm = function(email, token, select) {
  * Find key by email.
  * The data return are Read Only (Plain Objet) instead of MongooseDocument
  *
- * @param {string} userId
+ * @param {string} email
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
  */
 var findReadOnlyByEmail = function(email, select) {
     var query = Key
@@ -91,10 +100,61 @@ var findReadOnlyByEmail = function(email, select) {
 };
 
 /**
+ * Find key by email and token.
+ * The data return are Read Only (Plain Objet) instead of MongooseDocument
+ *
+ * @param {string} email
+ * @param {string} token
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
+ */
+var findOneReadOnlyByEmailAndToken = function(email, token, select) {
+    var query = Key
+        .findOne()
+        .where({ 'email': email })
+        .and([{ 'token': token }])
+        .lean()
+        .sort('-createdAt');
+
+    if (select) {
+        query.select(select);
+    }
+
+    return query.exec();
+};
+
+/**
+ * Find key by email and name.
+ * The data return are Read Only (Plain Objet) instead of MongooseDocument
+ *
+ * @param {string} email
+ * @param {string} name
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
+ */
+var findOneReadOnlyActiveByEmailAndName = function(email, name, select) {
+    var query = Key
+        .findOne()
+        .where({ 'email': email })
+        .and([{ 'name': name }, { 'status': keyConst.status.CONFIRMED }])
+        .lean()
+        .sort('-createdAt');
+
+    if (select) {
+        query.select(select);
+    }
+
+    return query.exec();
+};
+
+/**
  * Find key by name (and email).
  * The data return are Read Only (Plain Objet) instead of MongooseDocument
  *
- * @param {string} projectId
+ * @param {string} name
+ * @param {string} email
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
  */
 var findReadOnlyByName = function(name, email, select) {
     var query = Key
@@ -113,10 +173,12 @@ var findReadOnlyByName = function(name, email, select) {
 };
 
 module.exports = {
-    removeById            : removeById,
-    findOneById           : findOneById,
-    findOneReadOnlyById   : findOneReadOnlyById,
-    findOneToConfirm      : findOneToConfirm,
-    findReadOnlyByEmail   : findReadOnlyByEmail,
-    findReadOnlyByName    : findReadOnlyByName
+    removeById                  : removeById,
+    findOneById                 : findOneById,
+    findOneReadOnlyById         : findOneReadOnlyById,
+    findOneToConfirm            : findOneToConfirm,
+    findReadOnlyByEmail         : findReadOnlyByEmail,
+    findReadOnlyByName          : findReadOnlyByName,
+    findOneReadOnlyByEmailAndToken      : findOneReadOnlyByEmailAndToken,
+    findOneReadOnlyActiveByEmailAndName : findOneReadOnlyActiveByEmailAndName
 };

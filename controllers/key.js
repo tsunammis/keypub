@@ -167,16 +167,20 @@ var key = function(req, res, next) {
         })
         .then(function() {
             return Key.create({
-                data: data,
+                content: data,
                 email: email,
                 status: 'pending',
+                name: keyName,
                 token: randomstring.generate(Configuration.tokenLength)
             });
         })
         .then(function(key) {
             key = key.toObject();
-            mailService.sendConfirmation(key.email, key.token);
             console.log(JSON.stringify(key));
+            return mailService.sendConfirmation(key.email, key.token);
+        })
+        .then(function(info) {
+            console.log('Message sent: ' + info.response);
         })
         .then(null, function(err) {
             if (_.has(err, 'code')) {
@@ -191,7 +195,6 @@ var key = function(req, res, next) {
     console.log('key: ' + req.param('key'));
     return next();
 };
-
 
 module.exports = {
     email: email,
