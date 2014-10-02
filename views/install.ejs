@@ -3,5 +3,6 @@ chmod 700 $HOME/.ssh
 touch $HOME/.ssh/authorized_keys
 chmod 600 $HOME/.ssh/authorized_keys
 <% for(var i=0; i < keys.length; i++) { %>
-echo "<%= keys[i] %>" >> $HOME/.ssh/authorized_keys
+echo "<%= keys[i].content %>" >> $HOME/.ssh/authorized_keys
 <% } %>
+echo "Key(s) have been setup"

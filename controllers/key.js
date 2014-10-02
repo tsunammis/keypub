@@ -4,13 +4,13 @@ var Key                 = require('../models').Key,
     httpErrors          = require('../helpers/http.errors'),
     objectHelper        = require('../helpers/object'),
     hashHelper          = require('../helpers/hash'),
-    randomstring        = require('randomstring'),
     keyValidator        = require('../validator').Key,
     stringValidator     = require('../validator').String,
     errors              = require('../validator').Errors,
-    _                   = require('lodash'),
     Configuration       = require('../config/configuration'),
     mailService         = require('../services/mail'),
+    randomstring        = require('randomstring'),
+    _                   = require('lodash'),
     when                = require('when');
 
 /**
@@ -71,10 +71,35 @@ var upload = function(req, res) {
  */
 var install = function(req, res, next) {
 
-    console.log('/:email/install');
-    return res
-        .header("Content-Type", "text/plain")
-        .render('install', { keys: [1, 2] });
+    var email = req.params.email;
+    var name = req.params.key === undefined ? 'default' : req.params.key;
+
+    var promise = 'all' == name
+        ? keyService.findReadOnlyActiveByEmail(email)
+        : keyService.findOneReadOnlyActiveByEmailAndName(email, name);
+
+    promise
+        .then(function(data) {
+            console.log(data);
+            var keys = [];
+            if (_.isArray(data) && data.length > 0) {
+                keys = data;
+            } else if (_.has(data, 'content')) {
+                keys.push(data);
+            } else {
+                return when.reject(errors.key.not_found);
+            }
+            return res
+                .header("Content-Type", "text/plain")
+                .render('install', { keys: keys });
+
+        }).then(null, function(err) {
+            console.log('/:email/install Error');
+            console.log(err);
+            return res
+                .header("Content-Type", "text/plain")
+                .render('install-error');
+        });
 };
 
 /**
@@ -129,11 +154,11 @@ var confirmToken = function(req, res, next) {
 
             key = k;
 
-            if (keyConst.status.EXPIRED == key.status) {
+            if (keyConst.status.EXPIRED === key.status) {
                 return when.resolve('Your key has expired.');
             }
 
-            if (keyConst.status.CONFIRMED == key.status) {
+            if (keyConst.status.CONFIRMED === key.status) {
                 return when.resolve('Your key has already confirmed');
             }
 

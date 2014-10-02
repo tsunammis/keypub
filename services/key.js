@@ -100,6 +100,29 @@ var findReadOnlyByEmail = function(email, select) {
 };
 
 /**
+ * Find keys by email.
+ * The data return are Read Only (Plain Objet) instead of MongooseDocument
+ *
+ * @param {string} email
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
+ */
+var findReadOnlyActiveByEmail = function(email, select) {
+    var query = Key
+        .find()
+        .where({ 'email': email })
+        .and([{ 'status': keyConst.status.CONFIRMED }])
+        .lean()
+        .sort('-createdAt');
+
+    if (select) {
+        query.select(select);
+    }
+
+    return query.exec();
+};
+
+/**
  * Find key by email and token.
  * The data return are Read Only (Plain Objet) instead of MongooseDocument
  *
@@ -179,6 +202,7 @@ module.exports = {
     findOneToConfirm            : findOneToConfirm,
     findReadOnlyByEmail         : findReadOnlyByEmail,
     findReadOnlyByName          : findReadOnlyByName,
+    findReadOnlyActiveByEmail   : findReadOnlyActiveByEmail,
     findOneReadOnlyByEmailAndToken      : findOneReadOnlyByEmailAndToken,
     findOneReadOnlyActiveByEmailAndName : findOneReadOnlyActiveByEmailAndName
 };
