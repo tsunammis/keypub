@@ -39,6 +39,7 @@ var email = function(req, res, next) {
  *
  * Also, if parameter 'keypath' is specified, the script will contain
  * the absolute path to the key to install.
+ * curl -s http://localhost:5000/stanislas.chollet@gmail.com/ovh/upload?keypath=/home/stan/.ssh/ovh.pub
  *
  * GET  /:email/upload
  * GET  /:email/:key/upload
