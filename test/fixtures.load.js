@@ -2,25 +2,21 @@ var MongoClient     = require('mongodb').MongoClient,
     DataFixtures    = require('./fixtures.data'),
     configuration   = require('../config/configuration');
 
-// Connect to the db
-MongoClient.connect(configuration.mongodb, function(err, db) {
+module.exports = function(done) {
+    // Connect to the db
+    MongoClient.connect(configuration.mongodb, function(err, db) {
 
-    if (err) {
-        return console.dir(err);
-    }
+        if (err) {
+            return console.dir(err);
+        }
 
-    var collectionUsers     = db.collection('users');
-    var collectionStatus    = db.collection('status');
-    var collectionProject   = db.collection('projects');
+        var collectionKeys = db.collection('keys');;
 
-    collectionUsers.remove(function(err) {
-        collectionUsers.insert(DataFixtures.Users, {w:1}, function(err, result) {});
+        collectionKeys.remove(function(err) {
+            collectionKeys.insert(DataFixtures.Datakeys, {w:1}, function(err, result) {
+                done();
+            });
+        });
+
     });
-    collectionStatus.remove(function(err) {
-        collectionStatus.insert(DataFixtures.Status, {w:1}, function(err, result) {});
-    });
-    collectionProject.remove(function(err) {
-        collectionProject.insert(DataFixtures.Projects, {w:1}, function(err, result) {});
-    });
-
-});
+};

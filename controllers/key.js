@@ -2,7 +2,6 @@ var Key                 = require('../models').Key,
     keyService          = require('../services').Key,
     keyConst            = require('../const').Key,
     httpErrors          = require('../helpers/http.errors'),
-    objectHelper        = require('../helpers/object'),
     hashHelper          = require('../helpers/hash'),
     keyValidator        = require('../validator').Key,
     stringValidator     = require('../validator').String,
@@ -20,8 +19,27 @@ var Key                 = require('../models').Key,
  */
 var email = function(req, res, next) {
 
-    console.log('/:email/');
-    return next();
+    var email = req.params.email;
+    var promise = keyService.findReadOnlyActiveByEmail(email);
+
+    promise
+        .then(function(data) {
+            console.log(data);
+            if (!_.isArray(data) || data.length < 1) {
+                return when.reject(errors.key.not_found);
+            }
+            return res
+                .header("Content-Type", "text/html")
+                .render('bash/keys', { keys: data });
+
+        }).then(null, function(err) {
+            console.log('/:email/install Error');
+            console.log(err);
+            return res
+                .status(404)
+                .header("Content-Type", "text/plain")
+                .render('bash/install-error');
+        });
 };
 
 /**
@@ -46,15 +64,13 @@ var email = function(req, res, next) {
  */
 var upload = function(req, res) {
 
-    console.log('/:email/upload or /:email/:key/upload');
-    
     var keypath = req.query.keypath === undefined ? '' : req.query.keypath;
     var email = req.params.email;
     var keyname = req.params.key === undefined ? 'default' : req.params.key;
     
     return res
         .header("Content-Type", "text/plain")
-        .render('upload', { 
+        .render('bash/upload', {
             rootUrl: Configuration.getRootUrl(),
             keypath: keypath,
             email:   email,
@@ -81,7 +97,6 @@ var install = function(req, res, next) {
 
     promise
         .then(function(data) {
-            console.log(data);
             var keys = [];
             if (_.isArray(data) && data.length > 0) {
                 keys = data;
@@ -91,15 +106,15 @@ var install = function(req, res, next) {
                 return when.reject(errors.key.not_found);
             }
             return res
+                .status(200)
                 .header("Content-Type", "text/plain")
-                .render('install', { keys: keys });
+                .render('bash/install', { keys: keys });
 
         }).then(null, function(err) {
-            console.log('/:email/install Error');
-            console.log(err);
             return res
+                .status(404)
                 .header("Content-Type", "text/plain")
-                .render('install-error');
+                .render('bash/install-error');
         });
 };
 
@@ -132,7 +147,8 @@ var fingerprint = function(req, res, next) {
 var confirmToken = function(req, res, next) {
 
     var data = req.params,
-        key = null;
+        key = null,
+        newKey = null;
 
     stringValidator.isEmail(data.email)
         .then(function() {
@@ -152,20 +168,31 @@ var confirmToken = function(req, res, next) {
             if (!k) {
                 return when.reject(new httpErrors.NotFound(errors.key.not_found));
             }
+            // newKey is used inside next function
+            newKey = k;
 
-            key = k;
+            return keyService.findOneActiveByEmailAndName(
+                k.email,
+                k.name
+            );
+        })
+        .then(function(oldKey) {
+            if (oldKey) {
+                // TODO Add promise with oldKey.remove()
+                oldKey.remove();
+            }
 
-            if (keyConst.status.EXPIRED === key.status) {
+            if (keyConst.status.EXPIRED === newKey.status) {
                 return when.resolve('Your key has expired.');
             }
 
-            if (keyConst.status.CONFIRMED === key.status) {
+            if (keyConst.status.CONFIRMED === newKey.status) {
                 return when.resolve('Your key has already confirmed');
             }
 
             // TODO Add promise with key.save()
-            key.status = keyConst.status.CONFIRMED;
-            key.save();
+            newKey.status = keyConst.status.CONFIRMED;
+            newKey.save();
             return when.resolve('your key has been confirmed');
         })
         .then(function(message) {
@@ -195,6 +222,8 @@ var key = function(req, res, next) {
     var email = req.params.email;
     var keyName = req.params.keyName;
 
+    // TODO add forbidden words like 'all'
+
     keyValidator.data(data)
         .then(function() {
             return stringValidator.isEmail(email);
@@ -210,7 +239,6 @@ var key = function(req, res, next) {
         })
         .then(function(key) {
             key = key.toObject();
-            console.log(JSON.stringify(key));
             return mailService.sendConfirmation(key.email, key.token);
         })
         .then(function(info) {
@@ -225,16 +253,14 @@ var key = function(req, res, next) {
             return next(err);
         });
 
-    console.log('/:email/:keyName');
-    console.log('key: ' + req.param('key'));
     return next();
 };
 
 module.exports = {
-    email: email,
-    upload: upload,
-    install: install,
-    fingerprint: fingerprint,
-    confirmToken: confirmToken,
-    key: key
+    email           : email,
+    upload          : upload,
+    install         : install,
+    fingerprint     : fingerprint,
+    confirmToken    : confirmToken,
+    key             : key
 };

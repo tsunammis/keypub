@@ -25,6 +25,7 @@ app.route('/:email/:key/install').get(controllers.Key.install);
 app.route('/:email/:key/upload').get(controllers.Key.upload);
 app.route('/:email/:keyName').post(controllers.Key.key);
 app.route('/:email').get(controllers.Key.email);
+app.route('/').get(controllers.Default.home);
 
 // Handle error(s)
 app.use(controllers.Default.errorHandler);

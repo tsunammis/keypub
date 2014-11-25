@@ -171,6 +171,28 @@ var findOneReadOnlyActiveByEmailAndName = function(email, name, select) {
 };
 
 /**
+ * Find key by email and name.
+ *
+ * @param {string} email
+ * @param {string} name
+ * @param {string} select Specify the fields to be retrieved
+ * @return {promise}
+ */
+var findOneActiveByEmailAndName = function(email, name, select) {
+    var query = Key
+        .findOne()
+        .where({ 'email': email })
+        .and([{ 'name': name }, { 'status': keyConst.status.CONFIRMED }])
+        .sort('-createdAt');
+
+    if (select) {
+        query.select(select);
+    }
+
+    return query.exec();
+};
+
+/**
  * Find key by name (and email).
  * The data return are Read Only (Plain Objet) instead of MongooseDocument
  *
@@ -204,5 +226,6 @@ module.exports = {
     findReadOnlyByName          : findReadOnlyByName,
     findReadOnlyActiveByEmail   : findReadOnlyActiveByEmail,
     findOneReadOnlyByEmailAndToken      : findOneReadOnlyByEmailAndToken,
-    findOneReadOnlyActiveByEmailAndName : findOneReadOnlyActiveByEmailAndName
+    findOneReadOnlyActiveByEmailAndName : findOneReadOnlyActiveByEmailAndName,
+    findOneActiveByEmailAndName : findOneActiveByEmailAndName
 };

@@ -1,6 +1,19 @@
 var _ = require('lodash');
 
 /**
+ * Homepage
+ *
+ * GET  /
+ */
+var home = function(req, res, next) {
+
+    return res
+        .status(200)
+        .header("Content-Type", "text/html")
+        .render('html/homepage');
+};
+
+/**
  * Error handler
  *
  * @param {Request}     request
@@ -14,9 +27,15 @@ var errorHandler = function(err, req, res, next) {
     if (_.has(err, 'code')) {
         error.code = err.code;
     }
-    res.status(err.status || 500);
-    res.contentType('application/json');
-    res.send(error);
+    return res
+        .status(err.status || 500)
+        .header("Content-Type", "text/html")
+        .render('html/error', {
+            error: error
+        });
 };
 
-module.exports.errorHandler = errorHandler;
+module.exports = {
+    home         : home,
+    errorHandler : errorHandler
+};

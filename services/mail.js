@@ -27,9 +27,14 @@ var sendConfirmation = function(email, token) {
         })
         .then(function(oldKey) {
 
-            link = Configuration.getRootUrl() + '/' + email + '/confirm/' + token;
+            var link = Configuration.getRootUrl() + '/' + email + '/confirm/' + token;
 
-            html = Mailer.getContentFromFile(
+            if (oldKey) {
+                console.log('has old key');
+            }
+            console.log(link);
+
+            var html = Mailer.getContentFromFile(
                 Mailer.CONFIRMATION_HTML,
                 {
                     link: link,

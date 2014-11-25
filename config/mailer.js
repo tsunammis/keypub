@@ -33,8 +33,8 @@ function Mailer() {
  */
 Mailer.prototype.getContentFromFile = function(path, data) {
     return ejs.render(
-            fs.readFileSync(path, Configuration.encoding),
-            data
+        fs.readFileSync(path, Configuration.encoding),
+        data
     );
 };
 
